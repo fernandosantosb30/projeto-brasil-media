@@ -1,0 +1,15 @@
+custo_medio/
+├── backend/                # FastAPI
+│   ├── app/
+│   │   ├── main.py         # Ponto de entrada
+│   │   ├── database.py     # Conexão MySQL (SQLAlchemy)
+│   │   ├── models.py       # Tabelas do Banco
+│   │   ├── schemas.py      # Validação de dados (Pydantic)
+│   │   ├── services/       # Lógica de negócio e integração VSB
+│   │   └── routes/         # Endpoints da API
+│   └── requirements.txt
+├── frontend/               # React.js (Sugerido)
+│   ├── src/
+│   │   ├── components/     # Filtros e Tabelas
+│   │   └── services/       # Integração com o BackEnd
+└── docker-compose.yml      # Para rodar o MySQL e o App

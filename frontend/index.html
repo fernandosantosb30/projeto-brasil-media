@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Custos - Brasil Tecpar</title>
+    <link rel="stylesheet" href="src/styles/style.css">
+</head>
+<body>
+
+    <!-- Cabeçalho com o nome da empresa -->
+    <header>
+        <div class="logo">BRASIL <span>TECPAR</span></div>
+        <p>Painel de Análise de Custo Médio</p>
+    </header>
+
+    <main class="container">
+        <section class="filter-card">
+            <h2>Filtros de Pesquisa</h2>
+            
+            <div class="input-grid">
+                <div class="field">
+                    <label>Cidade</label>
+                    <input type="text" id="cidade" placeholder="Ex: Santa Maria">
+                </div>
+                <div class="field">
+                    <label>UF</label>
+                    <input type="text" id="uf" placeholder="RS" maxlength="2">
+                </div>
+                <div class="field">
+                    <label>Velocidade (Mbps)</label>
+                    <input type="number" id="velocidade" placeholder="Ex: 500">
+                </div>
+                <div class="field">
+                    <label>Prazo Contratual</label>
+                    <select id="prazo">
+                        <option value="">Selecione o prazo</option>
+                        <option value="12">12 meses</option>
+                        <option value="24">24 meses</option>
+                        <option value="36">36 meses</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-primary">CALCULAR CUSTO MÉDIO</button>
+        </section>
+
+        <!-- Área onde os resultados aparecerão depois -->
+        <section class="results-area">
+            <div class="stat-box">
+                <span>Média Estimada</span>
+                <strong id="display-media">R$ 0,00</strong>
+            </div>
+            <div class="stat-box">
+                <span>Contratos Analisados</span>
+                <strong id="display-qtd">0</strong>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>

@@ -3,22 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Custos - Brasil Tecpar</title>
-    <link rel="stylesheet" href="src/styles/style.css">
+    <title>Painel de Custos - Brasil Tecpar</title>
+    <style>
+        /* CSS DIRETO NO ARQUIVO PARA NÃO DAR ERRO DE CARREGAMENTO */
+        :root {
+            --primary-blue: #0ea5e9;
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --text-white: #f8fafc;
+            --text-gray: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .main-header { text-align: center; padding: 40px; }
+        .main-header h1 span { color: var(--primary-blue); }
+
+        .container { width: 100%; max-width: 600px; padding: 20px; }
+
+        .search-section { 
+            background: var(--card-dark); 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .field { display: flex; flex-direction: column; margin-bottom: 10px; }
+        label { font-size: 0.75rem; color: var(--text-gray); margin-bottom: 5px; text-transform: uppercase; }
+        
+        input, select { 
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            color: white; 
+            padding: 10px; 
+            border-radius: 6px; 
+        }
+
+        .btn-calculate { 
+            width: 100%; 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: var(--primary-blue); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+
+        .results-container { display: flex; gap: 20px; margin-top: 20px; }
+        .result-box { 
+            background: var(--card-dark); 
+            padding: 15px; 
+            border-radius: 10px; 
+            flex: 1; 
+            text-align: center; 
+            border: 1px solid #334155;
+        }
+        .result-box strong { display: block; color: var(--primary-blue); font-size: 1.4rem; margin-top: 5px; }
+    </style>
 </head>
 <body>
 
-    <!-- Cabeçalho com o nome da empresa -->
-    <header>
-        <div class="logo">BRASIL <span>TECPAR</span></div>
+    <header class="main-header">
+        <h1>BRASIL <span>TECPAR</span></h1>
         <p>Painel de Análise de Custo Médio</p>
     </header>
 
     <main class="container">
-        <section class="filter-card">
+        <section class="search-section">
             <h2>Filtros de Pesquisa</h2>
             
-            <div class="input-grid">
+            <div class="filter-grid">
                 <div class="field">
                     <label>Cidade</label>
                     <input type="text" id="cidade" placeholder="Ex: Santa Maria">
@@ -28,10 +95,25 @@
                     <input type="text" id="uf" placeholder="RS" maxlength="2">
                 </div>
                 <div class="field">
-                    <label>Velocidade (Mbps)</label>
-                    <input type="number" id="velocidade" placeholder="Ex: 500">
+                    <label>Tipo de Serviço</label>
+                    <select id="tipo_servico">
+                        <option value="">Selecione</option>
+                        <option value="fibra">Fibra Óptica</option>
+                        <option value="radio">Rádio</option>
+                        <option value="dedicado">Link Dedicado</option>
+                    </select>
                 </div>
                 <div class="field">
+                    <label>Velocidade / Banda</label>
+                    <div class="input-group">
+                        <input type="number" id="velocidade" placeholder="500">
+                        <select id="unidade">
+                            <option value="Mbps">Mbps</option>
+                            <option value="GB">GB</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field full-width">
                     <label>Prazo Contratual</label>
                     <select id="prazo">
                         <option value="">Selecione o prazo</option>
@@ -42,21 +124,36 @@
                 </div>
             </div>
 
-            <button class="btn-primary">CALCULAR CUSTO MÉDIO</button>
+                <div class="field">
+                    <label>Interface</label>
+                    <select id="interface">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>IP Fixo</label>
+                    <select id="ip_fixo">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+
+            <!-- Procure a linha do botão e garanta que ela tenha o onclick -->
+            <button class="btn-calculate" onclick="buscarMedia()">CALCULAR CUSTO MÉDIO</button>
         </section>
 
-        <!-- Área onde os resultados aparecerão depois -->
-        <section class="results-area">
-            <div class="stat-box">
+        <section class="results-container">
+            <div class="result-box highlight">
                 <span>Média Estimada</span>
                 <strong id="display-media">R$ 0,00</strong>
             </div>
-            <div class="stat-box">
+            <div class="result-box">
                 <span>Contratos Analisados</span>
                 <strong id="display-qtd">0</strong>
             </div>
         </section>
     </main>
 
+    <script src="src/services/script.js"></script>
 </body>
 </html>

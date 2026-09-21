@@ -1,0 +1,12 @@
+**
+!Dockerfile
+!backend/
+!backend/requirements.txt
+!backend/__init__.py
+!backend/dados_ficticios.csv
+!backend/app/
+!backend/app/**
+!frontend/
+!frontend/**
+**/__pycache__/
+**/*.pyc

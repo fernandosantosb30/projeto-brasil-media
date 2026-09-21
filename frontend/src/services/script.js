@@ -1,77 +1,93 @@
-// 1. Função para carregar os filtros dinâmicos da planilha ao abrir o site
+'use strict';
+
+const el = (id) => document.getElementById(id);
+const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+async function verificarResposta(response) {
+    if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(typeof body.detail === 'string' ? body.detail : 'Não foi possível concluir. Verifique os campos e tente novamente.');
+    }
+    return response;
+}
+
 async function carregarFiltros() {
     try {
-        const response = await fetch('http://127.0.0.1:8000/filtros/opcoes');
-        if (!response.ok) throw new Error('Falha ao carregar opções');
-        
+        const response = await verificarResposta(await fetch('/filtros/opcoes'));
         const opcoes = await response.json();
-
-        // Preenche os selects com os dados reais da planilha
-        preencherSelect('tipo_servico', opcoes.servicos);
-        preencherSelect('interface', opcoes.interfaces);
-        preencherSelect('ip_fixo', opcoes.ips);
-        
-    } catch (e) {
-        console.error("Erro ao carregar filtros:", e);
-    }
-}
-
-// Função auxiliar para montar as opções dentro dos <select>
-function preencherSelect(id, lista) {
-    const select = document.getElementById(id);
-    if (!select) return;
-    
-    select.innerHTML = '<option value="">Todos</option>';
-    lista.forEach(item => {
-        if (item && item !== 'NAN') {
-            select.innerHTML += `<option value="${item}">${item}</option>`;
+        for (const [id, key] of [['tipo_servico', 'servicos'], ['interface', 'interfaces'], ['ip_fixo', 'ips']]) {
+            // Option usa texto, sem interpretar conteúdo da base como HTML.
+            el(id).replaceChildren(new Option('Todos', ''), ...opcoes[key].map((item) => new Option(item, item)));
         }
-    });
-}
-
-// 2. Sua função de busca corrigida com os novos campos
-async function buscarMedia() {
-    // Captura os valores (incluindo os novos campos Interface e IP Fixo)
-    const cidade = document.getElementById('cidade').value;
-    const uf = document.getElementById('uf').value;
-    const tipo_servico = document.getElementById('tipo_servico').value;
-    const interfaceTec = document.getElementById('interface').value; // Novo
-    const ip_fixo = document.getElementById('ip_fixo').value;         // Novo
-    const velocidade = document.getElementById('velocidade').value;
-    const prazo = document.getElementById('prazo').value;
-
-    // Monta a URL com TODOS os parâmetros
-    const url = new URL('http://127.0.0.1:8000/contratos/custo-medio');
-    
-    if (cidade) url.searchParams.append('cidade', cidade);
-    if (uf) url.searchParams.append('uf', uf);
-    if (tipo_servico) url.searchParams.append('tipo_servico', tipo_servico);
-    if (interfaceTec) url.searchParams.append('interface', interfaceTec);
-    if (ip_fixo) url.searchParams.append('ip_fixo', ip_fixo);
-    if (velocidade) url.searchParams.append('velocidade', velocidade);
-    if (prazo) url.searchParams.append('prazo', prazo);
-
-    try {
-        const response = await fetch(url);
-        
-        if (!response.ok) throw new Error('Erro na resposta do servidor');
-        
-        const dados = await response.json();
-
-        // Atualiza a tela
-        document.getElementById('display-media').innerText = 
-            `R$ ${dados.custo_medio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        
-        document.getElementById('display-qtd').innerText = dados.quantidade_contratos;
-
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao conectar com o Backend. Verifique se o Uvicorn está rodando!');
+        el('calcular').disabled = false;
+        el('processar').disabled = false;
+        el('status').textContent = 'Selecione os filtros para iniciar a consulta.';
+    } catch {
+        el('status').textContent = 'Não foi possível carregar as opções. Recarregue a página para tentar novamente.';
     }
 }
 
-// Substitua o final do seu script.js por isso:
-document.addEventListener('DOMContentLoaded', (event) => {
-    console.log('DOM carregado, buscando filtros...');
-    carregarFiltros();
-});
+async function buscarMedia(event) {
+    event.preventDefault();
+    el('calcular').disabled = true;
+    el('display-media').textContent = '—';
+    el('display-qtd').textContent = '—';
+    el('status').textContent = 'Consultando…';
+    try {
+        const params = new URLSearchParams();
+        for (const id of ['cidade', 'uf', 'tipo_servico', 'interface', 'ip_fixo', 'prazo']) {
+            const value = el(id).value.trim();
+            if (value) params.set(id, value);
+        }
+        if (el('velocidade').value) {
+            const mbps = Number(el('velocidade').value) * (el('unidade').value === 'Gbps' ? 1000 : 1);
+            if (!Number.isSafeInteger(mbps) || mbps <= 0 || mbps > 1000000000) {
+                throw new Error('Informe uma velocidade equivalente a um número inteiro positivo de Mbps.');
+            }
+            params.set('velocidade', mbps);
+        }
+        const response = await verificarResposta(await fetch(`/contratos/custo-medio?${params}`));
+        const dados = await response.json();
+        el('display-media').textContent = dados.custo_medio === null ? 'Sem dados' : moeda.format(dados.custo_medio);
+        el('display-qtd').textContent = dados.quantidade_contratos;
+        el('status').textContent = dados.mensagem;
+    } catch (error) {
+        el('status').textContent = error instanceof TypeError ? 'Conexão indisponível. Tente novamente.' : error.message;
+    } finally {
+        el('calcular').disabled = false;
+    }
+}
+
+async function processarLote(event) {
+    event.preventDefault();
+    const file = el('arquivo').files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+        el('status-lote').textContent = 'O arquivo deve ter no máximo 2 MiB.';
+        return;
+    }
+    el('processar').disabled = true;
+    el('status-lote').textContent = 'Processando…';
+    try {
+        const data = new FormData();
+        data.append('file', file);
+        const response = await verificarResposta(await fetch('/contratos/processar-planilha', { method: 'POST', body: data }));
+        const url = URL.createObjectURL(await response.blob());
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'resultado_custos.csv';
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        el('status-lote').textContent = 'Consulta concluída. O download do resultado foi iniciado.';
+    } catch (error) {
+        el('status-lote').textContent = error instanceof TypeError ? 'Conexão indisponível. Tente novamente.' : error.message;
+    } finally {
+        el('processar').disabled = false;
+    }
+}
+
+el('consulta').addEventListener('submit', buscarMedia);
+el('lote').addEventListener('submit', processarLote);
+carregarFiltros();

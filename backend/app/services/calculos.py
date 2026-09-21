@@ -1,40 +1,33 @@
-import pandas as pd
-from sqlalchemy.orm import Session
-from ..models import Contrato
+from decimal import ROUND_HALF_UP, Decimal
 
-def processar_custo_medio(db: Session, filtros: dict):
-    # Inicia a consulta no banco de dados
-    query = db.query(Contrato)
-    
-    # Aplica filtros dinâmicos (Cidade, UF, Velocidade, etc)
-    for key, value in filtros.items():
-        if value is not None: # Garante que filtros vazios não quebrem a query
-            query = query.filter(getattr(Contrato, key) == value)
-    
-    # Converte a query do SQLAlchemy para um DataFrame do Pandas
-    df = pd.read_sql(query.statement, db.bind)
-    
-    if df.empty:
-        return {
-            "mensagem": "Nenhum dado encontrado para esses filtros",
-            "custo_medio": 0,
-            "quantidade_contratos": 0
-        }
+from ..schemas import Filtros, Resultado
 
-    # Retorna os cálculos estatísticos
-    return {
-        "custo_medio": round(float(df['valor_mensal'].mean()), 2),
-        "quantidade_contratos": int(len(df)),
-        "maximo": float(df['valor_mensal'].max()),
-        "minimo": float(df['valor_mensal'].min()),
-        "filtros_aplicados": filtros
-    }
 
-def definir_tipo_rede(valor):
-    """
-    Regra de Negócio: 
-    Se o valor for nulo ou igual a 0, é considerado Rede Própria.
-    """
-    if valor is None or valor == 0:
-        return "Rede Própria"
-    return "Rede Last-mile"
+def processar_custo_medio(data, filtros: Filtros) -> Resultado:
+    criterios = filtros.model_dump(exclude_none=True)
+
+    def selecionar(campos):
+        return [row for row in data if all(row[key] == value for key, value in campos.items())]
+
+    matches = selecionar(criterios)
+    tipo = "especifico"
+    mensagem = "Média dos contratos que atendem aos filtros selecionados."
+    # A alternativa regional relaxa somente a cidade, mantendo os demais critérios.
+    if not matches and filtros.cidade and filtros.uf:
+        matches = selecionar({key: value for key, value in criterios.items() if key != "cidade"})
+        tipo = "media_regional"
+        mensagem = "Média regional da UF: cidade desconsiderada; demais filtros preservados."
+    if not matches:
+        return Resultado(
+            custo_medio=None,
+            quantidade_contratos=0,
+            tipo_resultado="sem_dados",
+            mensagem="Nenhum contrato encontrado para estes filtros.",
+        )
+    media = sum((row["valor"] for row in matches), Decimal(0)) / len(matches)
+    return Resultado(
+        custo_medio=float(media.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)),
+        quantidade_contratos=len(matches),
+        tipo_resultado=tipo,
+        mensagem=mensagem,
+    )

@@ -1,24 +1,29 @@
-from pydantic import BaseModel
-from datetime import datetime
-from typing import Optional
+from typing import Literal
 
-class ContratoBase(BaseModel):
-    provedor_nome: str
-    tipo_servico: str
-    velocidade: int
-    bloco_ip: Optional[str]
-    cidade: str
-    uf: str
-    valor_mensal: float
-    vigencia: int
-    tipo_rede: str
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-class ContratoCreate(ContratoBase):
-    pass
+from .data_handler import normalizar_texto
 
-class ContratoResponse(ContratoBase):
-    id: int
-    data_importacao: datetime
 
-    class Config:
-        from_attributes = True
+class Filtros(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    cidade: str | None = Field(None, max_length=100)
+    uf: str | None = Field(None, pattern=r"^[A-Z]{2}$")
+    tipo_servico: str | None = Field(None, max_length=100)
+    interface: str | None = Field(None, max_length=100)
+    ip_fixo: str | None = Field(None, max_length=100)
+    velocidade: int | None = Field(None, gt=0, le=1_000_000_000)
+    prazo: int | None = Field(None, gt=0, le=1_000_000_000)
+
+    @field_validator("cidade", "uf", "tipo_servico", "interface", "ip_fixo", mode="before")
+    @classmethod
+    def limpar_texto(cls, value):
+        return normalizar_texto(value) or None
+
+
+class Resultado(BaseModel):
+    custo_medio: float | None
+    quantidade_contratos: int
+    tipo_resultado: Literal["especifico", "media_regional", "sem_dados"]
+    mensagem: str

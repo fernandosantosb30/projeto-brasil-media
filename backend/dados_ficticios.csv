@@ -1,0 +1,13 @@
+cidade,uf,tipo_servico,interface,ip_fixo,velocidade,prazo,valor
+Curitiba,PR,Link dedicado,Fibra,Sim,500,12,1000.00
+Curitiba,PR,Link dedicado,Fibra,Sim,500,12,1400.00
+Londrina,PR,Link dedicado,Fibra,Sim,500,12,1800.00
+Curitiba,PR,Link dedicado,Fibra,Sim,1000,24,2200.00
+Curitiba,PR,Banda larga,Fibra,Não,500,12,150.00
+Londrina,PR,Banda larga,Fibra,Não,500,12,170.00
+São Paulo,SP,Link dedicado,Fibra,Sim,500,12,1600.00
+Campinas,SP,Link dedicado,Fibra,Sim,500,12,2000.00
+São Paulo,SP,Banda larga,Fibra,Não,1000,24,250.00
+Recife,PE,Banda larga,Rádio,Não,100,12,120.00
+Recife,PE,Link dedicado,Fibra,Sim,500,36,1900.00
+Olinda,PE,Banda larga,Rádio,Não,100,12,140.00

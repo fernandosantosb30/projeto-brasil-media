@@ -1,0 +1,4 @@
+cidade;uf;tipo_servico;velocidade;interface;ip_fixo;prazo
+Curitiba;PR;Link dedicado;500;Fibra;Sim;12
+Maringá;PR;Link dedicado;500;Fibra;Sim;12
+Recife;PE;Banda larga;100;Rádio;Não;12

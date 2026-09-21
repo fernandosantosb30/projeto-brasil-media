@@ -1,159 +1,52 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Custos - Brasil Tecpar</title>
-    <style>
-        /* CSS DIRETO NO ARQUIVO PARA NÃO DAR ERRO DE CARREGAMENTO */
-        :root {
-            --primary-blue: #0ea5e9;
-            --bg-dark: #0f172a;
-            --card-dark: #1e293b;
-            --text-white: #f8fafc;
-            --text-gray: #94a3b8;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-white);
-            font-family: sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .main-header { text-align: center; padding: 40px; }
-        .main-header h1 span { color: var(--primary-blue); }
-
-        .container { width: 100%; max-width: 600px; padding: 20px; }
-
-        .search-section { 
-            background: var(--card-dark); 
-            padding: 30px; 
-            border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        
-        .field { display: flex; flex-direction: column; margin-bottom: 10px; }
-        label { font-size: 0.75rem; color: var(--text-gray); margin-bottom: 5px; text-transform: uppercase; }
-        
-        input, select { 
-            background: #0f172a; 
-            border: 1px solid #334155; 
-            color: white; 
-            padding: 10px; 
-            border-radius: 6px; 
-        }
-
-        .btn-calculate { 
-            width: 100%; 
-            margin-top: 20px; 
-            padding: 15px; 
-            background: var(--primary-blue); 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer;
-        }
-
-        .results-container { display: flex; gap: 20px; margin-top: 20px; }
-        .result-box { 
-            background: var(--card-dark); 
-            padding: 15px; 
-            border-radius: 10px; 
-            flex: 1; 
-            text-align: center; 
-            border: 1px solid #334155;
-        }
-        .result-box strong { display: block; color: var(--primary-blue); font-size: 1.4rem; margin-top: 5px; }
-    </style>
+    <meta name="description" content="Demonstração de análise de custos de conectividade com contratos fictícios.">
+    <title>Painel de Custos de Conectividade</title>
+    <link rel="stylesheet" href="/src/styles/styles.css">
+    <script src="/src/services/script.js" defer></script>
 </head>
 <body>
-
     <header class="main-header">
-        <h1>BRASIL <span>TECPAR</span></h1>
-        <p>Painel de Análise de Custo Médio</p>
+        <p class="eyebrow">PROJETO DEMONSTRATIVO</p>
+        <h1>Custos de <span>Conectividade</span></h1>
+        <p>Compare custos mensais por região e perfil de serviço.</p>
+        <p class="demo-notice">Todos os contratos e valores desta demonstração são fictícios.</p>
     </header>
-
     <main class="container">
-        <section class="search-section">
-            <h2>Filtros de Pesquisa</h2>
-            
-            <div class="filter-grid">
-                <div class="field">
-                    <label>Cidade</label>
-                    <input type="text" id="cidade" placeholder="Ex: Santa Maria">
+        <section class="search-section" aria-labelledby="titulo-filtros">
+            <h2 id="titulo-filtros">Consultar custo médio</h2>
+            <form id="consulta">
+                <div class="filter-grid">
+                    <div class="field"><label for="cidade">Cidade</label><input id="cidade" maxlength="100" placeholder="Ex.: Curitiba"></div>
+                    <div class="field"><label for="uf">UF</label><input id="uf" placeholder="PR" maxlength="2" minlength="2" pattern="[A-Za-z]{2}"></div>
+                    <div class="field"><label for="tipo_servico">Tipo de serviço</label><select id="tipo_servico"><option value="">Carregando…</option></select></div>
+                    <div class="field"><label for="velocidade">Velocidade</label><div class="input-group"><input type="number" id="velocidade" min="0.001" step="any" placeholder="500"><select id="unidade" aria-label="Unidade de velocidade"><option value="Mbps">Mbps</option><option value="Gbps">Gbps</option></select></div></div>
+                    <div class="field"><label for="prazo">Prazo contratual</label><input type="number" id="prazo" min="1" max="1000000000" step="1" placeholder="Meses"></div>
+                    <div class="field"><label for="interface">Interface</label><select id="interface"><option value="">Carregando…</option></select></div>
+                    <div class="field"><label for="ip_fixo">IP fixo</label><select id="ip_fixo"><option value="">Carregando…</option></select></div>
                 </div>
-                <div class="field">
-                    <label>UF</label>
-                    <input type="text" id="uf" placeholder="RS" maxlength="2">
-                </div>
-                <div class="field">
-                    <label>Tipo de Serviço</label>
-                    <select id="tipo_servico">
-                        <option value="">Selecione</option>
-                        <option value="fibra">Fibra Óptica</option>
-                        <option value="radio">Rádio</option>
-                        <option value="dedicado">Link Dedicado</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Velocidade / Banda</label>
-                    <div class="input-group">
-                        <input type="number" id="velocidade" placeholder="500">
-                        <select id="unidade">
-                            <option value="Mbps">Mbps</option>
-                            <option value="GB">GB</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="field full-width">
-                    <label>Prazo Contratual</label>
-                    <select id="prazo">
-                        <option value="">Selecione o prazo</option>
-                        <option value="12">12 meses</option>
-                        <option value="24">24 meses</option>
-                        <option value="36">36 meses</option>
-                    </select>
-                </div>
-            </div>
-
-                <div class="field">
-                    <label>Interface</label>
-                    <select id="interface">
-                        <option value="">Carregando...</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>IP Fixo</label>
-                    <select id="ip_fixo">
-                        <option value="">Carregando...</option>
-                    </select>
-                </div>
-
-            <!-- Procure a linha do botão e garanta que ela tenha o onclick -->
-            <button class="btn-calculate" onclick="buscarMedia()">CALCULAR CUSTO MÉDIO</button>
+                <button class="btn-calculate" id="calcular" disabled>Calcular custo médio</button>
+            </form>
+            <p class="help">Experimente Curitiba / PR, Link dedicado e 500 Mbps. Deixe os campos vazios para consultar toda a base.</p>
         </section>
-
-        <section class="results-container">
-            <div class="result-box highlight">
-                <span>Média Estimada</span>
-                <strong id="display-media">R$ 0,00</strong>
+        <section aria-label="Resultado da consulta" aria-live="polite">
+            <div class="results-container">
+                <div class="result-box highlight"><span>Custo médio mensal</span><strong id="display-media">—</strong></div>
+                <div class="result-box"><span>Contratos analisados</span><strong id="display-qtd">—</strong></div>
             </div>
-            <div class="result-box">
-                <span>Contratos Analisados</span>
-                <strong id="display-qtd">0</strong>
-            </div>
+            <p id="status" role="status">Carregando opções de consulta…</p>
+        </section>
+        <section class="search-section batch-section" aria-labelledby="titulo-lote">
+            <h2 id="titulo-lote">Consultar em lote</h2>
+            <p class="help">Envie um CSV com até 1.000 consultas e 2 MiB. O resultado inclui a média, a amostragem e o tipo de correspondência.</p>
+            <p><a href="/exemplo_consultas.csv" download>Baixar modelo com dados fictícios</a></p>
+            <form id="lote"><label for="arquivo">Arquivo CSV</label><input type="file" id="arquivo" accept=".csv,text/csv" required><button class="btn-calculate" id="processar" disabled>Processar e baixar resultado</button></form>
+            <p id="status-lote" role="status" aria-live="polite"></p>
         </section>
     </main>
-
-    <script src="src/services/script.js"></script>
+    <footer>Dados sintéticos para estudo e demonstração. <a href="/docs">Documentação da API</a></footer>
 </body>
 </html>

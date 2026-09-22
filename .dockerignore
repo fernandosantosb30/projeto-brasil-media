@@ -3,7 +3,7 @@
 !backend/
 !backend/requirements.txt
 !backend/__init__.py
-!backend/dados_ficticios.csv
+!backend/contratos.csv
 !backend/app/
 !backend/app/**
 !frontend/

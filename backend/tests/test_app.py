@@ -11,7 +11,7 @@ from backend.app.main import ROOT, create_app
 
 @pytest.fixture
 def client():
-    with TestClient(create_app(ROOT / "backend/dados_ficticios.csv")) as client:
+    with TestClient(create_app(ROOT / "backend/contratos.csv")) as client:
         yield client
 
 
@@ -19,8 +19,8 @@ def test_frontend_and_health(client):
     assert client.get("/health").json() == {"status": "ok"}
     assert "contratos e valores" in client.get("/").text
     assert client.get("/src/services/script.js").status_code == 200
-    assert client.get("/backend/dados_ficticios.csv").status_code == 404
     assert client.get("/backend/contratos.csv").status_code == 404
+    assert client.get("/private/contratos.csv").status_code == 404
     assert client.get("/.env").status_code == 404
 
 

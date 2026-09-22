@@ -5,7 +5,7 @@ COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt && useradd --create-home appuser
 COPY backend/app backend/app
 COPY backend/__init__.py backend/__init__.py
-COPY backend/dados_ficticios.csv backend/dados_ficticios.csv
+COPY backend/contratos.csv backend/contratos.csv
 COPY frontend frontend
 USER appuser
 EXPOSE 8000

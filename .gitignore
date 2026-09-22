@@ -29,5 +29,5 @@ contratos.csv
 *.tsv
 *.xlsx
 *.xls
-!backend/dados_ficticios.csv
+!backend/contratos.csv
 !frontend/exemplo_consultas.csv

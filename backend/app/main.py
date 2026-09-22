@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def create_app(data_path: Path | None = None):
     load_dotenv(ROOT / ".env", override=False)
-    path = data_path or Path(os.getenv("CONTRATOS_CSV", "backend/dados_ficticios.csv"))
+    path = data_path or Path(os.getenv("CONTRATOS_CSV", "backend/contratos.csv"))
     if not path.is_absolute():
         path = ROOT / path
 

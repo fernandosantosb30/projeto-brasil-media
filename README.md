@@ -57,7 +57,7 @@ backend/
     routes/contratos.py    # Consulta individual e lote
     services/calculos.py   # Regra de média e alternativa regional
   tests/test_app.py        # Testes automatizados
-  dados_ficticios.csv       # Base inteiramente fictícia
+  contratos.csv            # Base inteiramente fictícia
   requirements.txt         # Dependências de execução fixadas
   requirements-dev.txt     # Ferramentas de desenvolvimento
 frontend/
@@ -102,11 +102,13 @@ A configuração padrão funciona sem `.env`. Para alterá-la, copie `.env.examp
 
 | Variável | Padrão | Descrição |
 | --- | --- | --- |
-| `CONTRATOS_CSV` | `backend/dados_ficticios.csv` | Caminho absoluto ou relativo à raiz para a base de consulta |
+| `CONTRATOS_CSV` | `backend/contratos.csv` | Caminho absoluto ou relativo à raiz para a base de consulta |
 
 Variáveis definidas no ambiente têm prioridade sobre `.env`. Reinicie o servidor depois de alterar a base ou a configuração. Uma base ausente ou inválida impede a inicialização, em vez de produzir médias enganosas.
 
-Para experimentos privados, use `private/`, que está no `.gitignore`. A interface desta edição identifica os dados como fictícios: mantenha apenas bases sintéticas em qualquer demonstração pública.
+Para uso pessoal, mantenha a planilha original intacta em `private/contratos.csv`. Essa pasta não é versionada nem enviada ao Docker. O padrão `backend/contratos.csv` é sempre artificial. Para selecionar outra base local, use `CONTRATOS_CSV=private/contratos.csv` no `.env`, após validar o formato e os registros conforme as regras abaixo. Uma base com campos obrigatórios ausentes ou valores inválidos será rejeitada; preserve o original e faça eventuais correções somente em uma cópia privada.
+
+A interface desta edição identifica os dados como fictícios: mantenha apenas bases sintéticas em qualquer demonstração pública. Não faça upload do original nem de suas cópias privadas ao GitHub.
 
 ### Docker (opcional)
 
@@ -193,8 +195,8 @@ O frontend não exige build. Uma verificação opcional de sintaxe, caso Node.js
 
 ## Publicação e direitos
 
-A edição atual contém dados sintéticos e referências genéricas. O arquivo `contratos.csv` é reservado a dados confidenciais, está excluído do versionamento e não é incluído no contêiner. Somente `backend/dados_ficticios.csv` e `frontend/exemplo_consultas.csv`, ambos sintéticos, são permitidos entre as planilhas versionadas. `.env`, bases locais, logs, chaves e resultados exportados estão excluídos por regras do `.gitignore`, que não removem arquivos já versionados.
+A edição atual contém dados sintéticos e referências genéricas. O arquivo `backend/contratos.csv` contém exclusivamente dados artificiais. A planilha original deve permanecer em `private/contratos.csv`, fora do Git e do contexto Docker; nunca substitua a versão demonstrativa pela original no caminho público. Somente `backend/contratos.csv` e `frontend/exemplo_consultas.csv`, ambos sintéticos, são permitidos entre as planilhas versionadas. `.env`, bases locais, logs, chaves e resultados exportados estão excluídos por regras do `.gitignore`, que não removem arquivos já versionados.
 
-Na preparação do envio ao GitHub, o histórico remoto foi inspecionado por padrões de credenciais e chaves privadas, sem ocorrências nessas regras de busca. Essa verificação não constitui uma auditoria completa. O histórico publicado foi reescrito para remover `contratos.csv` e o banco legado de todos os commits alcançáveis. Clones anteriores devem ser substituídos por novos clones para evitar reintroduzir esses dados. A remoção de referências não garante a exclusão de caches do GitHub ou cópias de terceiros; a purga de dados residuais do servidor deve ser solicitada ao suporte do GitHub. Caso credenciais já tenham sido expostas, removê-las dos arquivos atuais não substitui sua revogação ou rotação.
+Na preparação do envio ao GitHub, o histórico remoto foi inspecionado por padrões de credenciais e chaves privadas, sem ocorrências nessas regras de busca. Essa verificação não constitui uma auditoria completa. O histórico publicado foi reescrito para remover as versões confidenciais de `contratos.csv` e o banco legado dos commits antigos. Clones anteriores devem ser substituídos por novos clones para evitar reintroduzir esses dados. A remoção de referências não garante a exclusão de caches do GitHub ou cópias de terceiros; a purga de dados residuais do servidor deve ser solicitada ao suporte do GitHub. Caso credenciais já tenham sido expostas, removê-las dos arquivos atuais não substitui sua revogação ou rotação.
 
 Não foi encontrada licença no material original. Nenhuma licença ou cessão de direitos foi atribuída nesta revisão. Confirme a autorização para divulgar o código e o contexto de origem antes de publicar: substituir dados e nomes não estabelece direitos de distribuição.
